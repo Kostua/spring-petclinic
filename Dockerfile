@@ -1,5 +1,4 @@
 FROM openjdk:16-slim 
 VOLUME /tmp
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java","${JAVA_OPTS}","-jar","/app.jar"]
+COPY target/*.jar app.jar
+ENTRYPOINT ["java","-jar","/app.jar"]
