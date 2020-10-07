@@ -1,3 +1,10 @@
+def secrets = [
+  [path: 'secret/jenkins/dockerhub', engineVersion: 2, secretValues: [
+    [envVar: 'USERNAME', vaultKey: 'username'],
+    [envVar: 'PASSWORD', vaultKey: 'password']]],
+]
+def configuration = [vaultUrl: 'http://vault:8200',  vaultCredentialId: 'vault', engineVersion: 2]
+
 pipeline {
     agent any
     options {
@@ -19,7 +26,7 @@ pipeline {
                 // Get some code from a GitHub repository
                 git branch: "main", url: 'https://github.com/Kostua/spring-petclinic'
 
-                // Run Maven on a Unix agent.
+                // Run Maven make package and stash artifact with name "app" 
                 sh "mvn -Dmaven.test.failure.ignore=true -Dcheckstyle.skip package"
                 stash includes: '**/target/*.jar', name: 'app'
 
@@ -28,11 +35,31 @@ pipeline {
         stage('Build image'){
           agent any
           steps {
+                // Unstash artifact from pervious stage and build docker image
                 unstash 'app'
                 sh "docker build -t kostua/petclinic:latest ."
           }
 
         }
+
+        stage('Docker login') {
+          agent any
+           steps {
+                // Login to DockerHub with credential from Vault
+                withVault([configuration: configuration, vaultSecrets: secrets]) {
+                sh "docker login -u ${env.USERNAME} -p ${env.PASSWORD}"
+                
+                }
+            }
+
+        }
+        
+        stage('Docker push') {
+            steps {
+                sh "docker push kostua/petclinic:latest"
+            }
+        }
+
 
   }  
     post {
