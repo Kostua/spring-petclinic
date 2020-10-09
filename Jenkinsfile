@@ -11,6 +11,12 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '10'))
         disableConcurrentBuilds()
     }
+
+     environment {
+        TF_HOME = tool('terraform')
+        TF_IN_AUTOMATION = "true"
+        PATH = "$TF_HOME:$PATH"
+    }
   
     triggers {
       pollSCM('H/5 * * * *') 
@@ -59,6 +65,14 @@ pipeline {
                 sh "docker push kostua/petclinic:latest"
             }
         }
+
+        stage('Terraforn Init') {
+          steps {
+            sh "terraform -v"
+          }
+        }
+        
+        
 
 
   }  
