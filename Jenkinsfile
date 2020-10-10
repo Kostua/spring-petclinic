@@ -12,6 +12,10 @@ pipeline {
         disableConcurrentBuilds()
     }
 
+     parameters {
+        string(name: 'WORKSPACE', defaultValue: 'development', description:'setting up workspace for terraform')
+    }
+
      environment {
         TF_HOME = tool('terraform')
         TF_IN_AUTOMATION = "true"
@@ -68,7 +72,11 @@ pipeline {
 
         stage('Terraforn Init') {
           steps {
-            sh "terraform -v"
+                dir('delpoy/AWS/Terraform/live/operator-workspace'){
+                    sh "terraform init -input=false"
+                    sh "echo \$PWD"
+                    sh "whoami"
+          
           }
         }
         
