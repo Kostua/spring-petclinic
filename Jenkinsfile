@@ -76,7 +76,7 @@ pipeline {
                     sh "terraform init -input=false"
                     sh "echo \$PWD"
                     sh "whoami"
-          
+                }
           }
         }
         
