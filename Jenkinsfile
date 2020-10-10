@@ -1,7 +1,7 @@
 def secrets = [
   [path: 'secret/jenkins/dockerhub', engineVersion: 2, secretValues: [
-    [envVar: 'USERNAME', vaultKey: 'username'],
-    [envVar: 'PASSWORD', vaultKey: 'password']]],
+    [envVar: 'GITHUB_USERNAME', vaultKey: 'username'],
+    [envVar: 'GITHUB_PASSWORD', vaultKey: 'password']]],
 ]
 def configuration = [vaultUrl: 'http://vault:8200',  vaultCredentialId: 'vault', engineVersion: 2]
 
@@ -53,7 +53,7 @@ pipeline {
            steps {
                 // Login to DockerHub with credential from Vault
                 withVault([configuration: configuration, vaultSecrets: secrets]) {
-                sh "docker login -u ${env.USERNAME} -p ${env.PASSWORD}"
+                sh "docker login -u ${env.GITHUB_USERNAME} -p ${env.GITHUB_PASSWORD}"
                 
                 }
             }
