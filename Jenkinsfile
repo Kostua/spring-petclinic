@@ -2,6 +2,11 @@ def secrets = [
   [path: 'secret/jenkins/dockerhub', engineVersion: 2, secretValues: [
     [envVar: 'GITHUB_USERNAME', vaultKey: 'username'],
     [envVar: 'GITHUB_PASSWORD', vaultKey: 'password']]],
+  
+  [path: 'secret/jenkins/aws', engineVersion: 2, secretValues: [
+    [envVar: 'AWS_ACCESS_KEY_ID', vaultKey: 'access_key'],
+    [envVar: 'GITHUB_PASSWORD', vaultKey: 'secret_key']]],
+
 ]
 def configuration = [vaultUrl: 'http://vault:8200',  vaultCredentialId: 'vault', engineVersion: 2]
 
@@ -20,6 +25,8 @@ pipeline {
         TF_HOME = tool('terraform')
         TF_IN_AUTOMATION = "true"
         PATH = "$TF_HOME:$PATH"
+        ACCESS_KEY = "${env.AWS_ACCESS_KEY_ID}"
+        SECRET_KEY = "${env.AWS_SECRET_ACCESS_KEY}"
     }
   
     triggers {
