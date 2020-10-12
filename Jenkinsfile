@@ -80,7 +80,8 @@ pipeline {
         stage('Terraforn Init') {
           steps {
                 dir('deploy/AWS/Terraform/live/operator-workspace'){
-                    sh "terraform init -input=false"
+                    sh "echo $ACCESS_KEY"
+                    sh "terraform init -input=false -var 'access_key=$ACCESS_KEY' -var 'secret_key=$SECRET_KEY'"
                     sh "echo \$PWD"
                     sh "whoami"
                 }
