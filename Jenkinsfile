@@ -79,7 +79,7 @@ pipeline {
 
         stage('Terraforn Init') {
           steps {
-                dir('delpoy/AWS/Terraform/live/operator-workspace'){
+                dir('deploy/AWS/Terraform/live/operator-workspace'){
                     sh "terraform init -input=false"
                     sh "echo \$PWD"
                     sh "whoami"
