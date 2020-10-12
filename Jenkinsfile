@@ -5,7 +5,7 @@ def secrets = [
   
   [path: 'secret/jenkins/aws', engineVersion: 2, secretValues: [
     [envVar: 'AWS_ACCESS_KEY_ID', vaultKey: 'access_key'],
-    [envVar: 'GITHUB_PASSWORD', vaultKey: 'secret_key']]],
+    [envVar: 'AWS_SECRET_ACCESS_KEY', vaultKey: 'secret_key']]],
 
 ]
 def configuration = [vaultUrl: 'http://vault:8200',  vaultCredentialId: 'vault', engineVersion: 2]
