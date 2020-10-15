@@ -79,10 +79,8 @@ pipeline {
           steps {
                 withVault([configuration: configuration, vaultSecrets: secrets]){ 
                 dir('deploy/AWS/Terraform/live/operator-workspace'){
-                    sh "echo ${env.AWS_ACCESS_KEY_ID}"
                     sh "terraform init -input=false -var 'access_key=${env.AWS_ACCESS_KEY_ID}' -var 'secret_key=${env.AWS_SECRET_ACCESS_KEY}'"
-                    sh "echo \$PWD"
-                    sh "whoami"
+                  
                 }
               }
           }
