@@ -7,16 +7,16 @@ terraform {
   required_version = ">= 0.12"
 
   backend "s3" {
-    bucket = "terraform-us2ua-state"
-    key = "global/s3/operator/terraform.tfstate"
-    region = "us-east-2"
+    bucket         = "terraform-us2ua-state"
+    key            = "global/s3/operator/terraform.tfstate"
+    region         = "us-east-2"
     dynamodb_table = "terraform.locks"
   }
-  
+
 }
 
 provider "aws" {
-  region     = var.region
+  region = var.region
 }
 
 data "aws_ami" "ubuntu" {
@@ -41,8 +41,7 @@ resource "aws_instance" "main" {
   instance_type = "t2.nano"
 
   tags = {
-    Name  = var.name
-    TTL   = var.ttl
-    owner = "${var.name}-guide"
+    Environment = "dev"
+    Service     = "petclinic"
   }
 }

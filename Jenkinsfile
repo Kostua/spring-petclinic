@@ -86,10 +86,10 @@ pipeline {
           }
         }
 
-        stage('TerraformFormat'){
+        stage('Terraform Validate'){
             steps {
                 dir('deploy/AWS/Terraform/live/dev'){
-                    sh "terraform fmt -list=true -write=false -diff=true -check=true"
+                    sh "terraform validate"
                 }
             }
         }
