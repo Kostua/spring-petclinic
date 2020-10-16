@@ -78,13 +78,22 @@ pipeline {
         stage('Terraforn Init') {
           steps {
                 withVault([configuration: configuration, vaultSecrets: secrets]){ 
-                dir('deploy/AWS/Terraform/live/live'){
+                dir('deploy/AWS/Terraform/live/dev'){
                     sh "terraform init -input=false -var 'access_key=${env.AWS_ACCESS_KEY_ID}' -var 'secret_key=${env.AWS_SECRET_ACCESS_KEY}'"
                   
                 }
               }
           }
         }
+
+        stage('TerraformFormat'){
+            steps {
+                dir('deploy/AWS/Terraform/live/dev'){
+                    sh "terraform fmt -list=true -write=false -diff=true -check=true"
+                }
+            }
+        }
+
         
         
 
