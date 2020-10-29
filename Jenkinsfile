@@ -123,7 +123,7 @@ pipeline {
                     if(apply){
                         dir('deploy/AWS/Terraform/live/dev'){
                             unstash "terraform-plan"
-                            sh 'terraform apply terraform.tfplan'
+                            sh 'terraform apply terraform.tfplan -auto-approve'
                         }
                     }
                 }
