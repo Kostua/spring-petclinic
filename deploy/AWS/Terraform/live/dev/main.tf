@@ -1,47 +1,38 @@
-variable "name" { default = "dynamic-aws-creds-operator" }
-variable "region" { default = "us-east-2" }
-variable "path" { default = "global/s3/terraform.tfstate" }
-variable "ttl" { default = "1" }
+terraform {
+  # Allow any 0.13.x version of Terraform
+  required_version = "~> 0.13"
+}
+
 
 terraform {
-  required_version = ">= 0.12"
-
+  # Partial backend configuration
+  # The other setting will be passed from backend.hcl from
+  # command $terraforom init -backend-config=backend.hcl
   backend "s3" {
-    bucket         = "terraform-us2ua-state"
-    key            = "global/s3/operator/terraform.tfstate"
-    region         = "us-east-2"
-    dynamodb_table = "terraform.locks"
+    key = "global/s3/petclinic/dev/terraform.tfstate"
   }
-
 }
 
 provider "aws" {
+  # Allow any 3.11.x version of the AWS provider
+  version = "~> 3.11"
+  region  = var.region
+}
+
+module "vpcinstance" {
   region = var.region
+  source = "../../modules/vpcinstance"
+  vpc_name = var.vpc_name
+  cidr_vpc = var.cidr_vpc
+  cidr_subnet = var.cidr_subnet
+  availability_zone = var.availability_zone
+  instance_ami = var.instance_ami
+  instance_type = var.instance_type
+
 }
 
-data "aws_ami" "ubuntu" {
-  most_recent = true
 
-  filter {
-    name   = "name"
-    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
-  }
 
-  filter {
-    name   = "virtualization-type"
-    values = ["hvm"]
-  }
 
-  owners = ["099720109477"] # Canonical
-}
 
-# Create AWS EC2 Instance
-resource "aws_instance" "main" {
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = "t2.nano"
 
-  tags = {
-    Environment = "dev"
-    Service     = "petclinic"
-  }
-}

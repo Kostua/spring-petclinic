@@ -80,7 +80,7 @@ pipeline {
           steps {
                 withVault([configuration: configuration, vaultSecrets: secrets]){ 
                 dir('deploy/AWS/Terraform/live/dev'){
-                    sh "terraform init -input=false"
+                    sh "terraform init -backend-config=backend.hcl -input=false"
                   
                 }
               }
