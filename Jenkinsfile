@@ -108,10 +108,29 @@ pipeline {
             }
            }
 
-        
-        
-
-
+           stage('TerraformApply'){
+            steps {
+              withVault([configuration: configuration, vaultSecrets: secrets]){
+                script{
+                    def apply = false
+                    try {
+                        input message: 'Can you please confirm the apply', ok: 'Ready to Apply the Config'
+                        apply = true
+                    } catch (err) {
+                        apply = false
+                         currentBuild.result = 'UNSTABLE'
+                    }
+                    if(apply){
+                        dir('deploy/AWS/Terraform/live/dev'){
+                            unstash "terraform-plan"
+                            sh 'terraform apply terraform.tfplan'
+                        }
+                    }
+                }
+            }
+        }
+     }
+    
   }  
     post {
         always {
