@@ -1,2 +1,3 @@
 # from galaxy
 - src: phrosenberg.docker 
+- src: community.general.docker_compose
