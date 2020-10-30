@@ -20,6 +20,7 @@
       copy:
         src: ./docker-compose.yml
         dest: ./docker-compose.yml 
-    - community.general.docker_compose:
-        project_src: . 
+    - name: Run docker-compose
+      community.general.docker_compose:
+        project_src: .
         state: present
