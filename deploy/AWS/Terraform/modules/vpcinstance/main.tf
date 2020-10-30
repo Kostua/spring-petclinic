@@ -138,7 +138,7 @@ resource "null_resource" "example_provisioner" {
   }
 
   provisioner "local-exec" {
-    command = "ansible-galaxy collection install community.general.docker_compose && ansible-galaxy role install -r requirements.yml && ansible-playbook -u ec2-user -i '${aws_instance.webInstance.public_ip},' -T 300 provision.yml" 
+    command = "ansible-galaxy collection install community.general && ansible-galaxy role install -r requirements.yml && ansible-playbook -u ec2-user -i '${aws_instance.webInstance.public_ip},' -T 300 provision.yml" 
   }
 }
 
