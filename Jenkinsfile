@@ -48,67 +48,35 @@ pipeline {
 
             }
         }
-        stage('Build image'){
-          agent any
-          steps {
-                // Unstash artifact from pervious stage and build docker image
-                unstash 'app'
-                sh "docker build -t kostua/petclinic:latest ."
-          }
 
-        }
-
-        stage('Docker login') {
+        stage('Docker') {
           agent any
            steps {
                 // Login to DockerHub with credential from Vault
                 withVault([configuration: configuration, vaultSecrets: secrets]) {
+                unstash 'app'
+                sh "docker build -t kostua/petclinic:latest ."
                 sh "docker login -u ${env.GITHUB_USERNAME} -p ${env.GITHUB_PASSWORD}"
-                
+                sh "docker push kostua/petclinic:latest"
                 }
             }
 
         }
-        
-        stage('Docker push') {
-            steps {
-                sh "docker push kostua/petclinic:latest"
-            }
-        }
 
-        stage('Terraforn Init') {
+        stage('Terraform Init/Valitade/Plan') {
           steps {
                 withVault([configuration: configuration, vaultSecrets: secrets]){ 
                 dir('deploy/AWS/Terraform/live/dev'){
                     sh "terraform init -backend-config=backend.hcl -input=false"
-                  
+                    sh "terraform validate"
+                    sh "terraform plan -out terraform.tfplan"
+                    stash name: "terraform-plan", includes: "terraform.tfplan"
                 }
               }
           }
         }
 
-        stage('Terraform Validate'){
-            steps {
-                dir('deploy/AWS/Terraform/live/dev'){
-                    sh "terraform validate"
-                }
-            }
-        }
-
-        stage('Terraform Plan'){
-            steps {
-              withVault([configuration: configuration, vaultSecrets: secrets]){
-                dir('deploy/AWS/Terraform/live/dev'){
-                    
-                  sh "terraform plan -out terraform.tfplan"
-                  stash name: "terraform-plan", includes: "terraform.tfplan"
-                    
-                }
-              }
-            }
-           }
-
-           stage('TerraformApply'){
+           stage('Terraform Apply'){
             steps {
               withVault([configuration: configuration, vaultSecrets: secrets]){
                 script{
@@ -123,13 +91,23 @@ pipeline {
                     if(apply){
                         dir('deploy/AWS/Terraform/live/dev'){
                             unstash "terraform-plan"
-                            sh 'terraform apply terraform.tfplan'
+                            sh 'terraform apply -input=false -auto-approve terraform.tfplan'
                         }
                     }
                 }
             }
         }
      }
+          stage('Sanity check'){
+            steps {
+              withVault([configuration: configuration, vaultSecrets: secrets]){
+                 dir('deploy/AWS/Terraform/live/dev'){
+                  input "Does the staging environment look ok?"
+                  sh 'terraform destroy -input=false -auto-approve'
+                 }
+              }
+            }
+          }
     
   }  
     post {
