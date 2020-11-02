@@ -7,7 +7,7 @@ terraform {
 terraform {
   # Partial backend configuration
   # The other setting will be passed from backend.hcl from
-  # command $terraforom init -backend-config=backend.hcl
+  # command $terraform init -backend-config=backend.hcl
   backend "s3" {
     key = "global/s3/petclinic/dev/terraform.tfstate"
   }
