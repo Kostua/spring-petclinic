@@ -43,7 +43,7 @@ pipeline {
                 git branch: "main", url: 'https://github.com/Kostua/spring-petclinic'
 
                 // Run Maven make package and stash artifact with name "app" 
-                sh "mvn -Dmaven.test.failure.ignore=true -Dcheckstyle.skip package"
+                sh "mvn -Dmaven.test.failure.ignore=true package"
                 stash includes: '**/target/*.jar', name: 'app'
 
             }
