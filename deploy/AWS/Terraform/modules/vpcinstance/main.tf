@@ -89,18 +89,10 @@ resource "tls_private_key" "keypair" {
   algorithm   = "RSA"
 }
 
-resource "local_file" "privatekey" {
-    filename = "deploy.pem"
-    sensitive_content = tls_private_key.keypair.private_key_pem
-     provisioner "local-exec" {
-        command = "chmod 600 ${self.filename}"
-  }
-}
 
 
 resource "aws_key_pair" "ec2key" {
   key_name   = "publicKey"
-#  public_key = file(var.public_key_path)
   public_key = tls_private_key.keypair.public_key_openssh
 }
 
@@ -111,35 +103,6 @@ resource "aws_instance" "webInstance" {
   vpc_security_group_ids = [aws_security_group.sg_22.id, aws_security_group.sg_80.id]
   key_name               = aws_key_pair.ec2key.key_name
   tags                   = var.vpc_tags
-}
-#---------------------------------------------------------------------------------------------------------------------
-# Provision the server using remote-exec
-# ---------------------------------------------------------------------------------------------------------------------
-
-resource "null_resource" "example_provisioner" {
-  triggers = {
-    public_ip = aws_instance.webInstance.public_ip
-  }
-
-  connection {
-    type        = "ssh"
-    host        = aws_instance.webInstance.public_ip
-    user        = "ec2-user"
-#    private_key = file(var.ssh_key_private)
-    private_key = tls_private_key.keypair.private_key_pem
-  }
-
-  // change permissions to executable and pipe its output into a new file
-  provisioner "remote-exec" {
-    #  Install Python for Ansible
-    inline = [
-      "sudo yum install -y python3 pip3 docker-py libselinux-python"
-    ]
-  }
-
-  provisioner "local-exec" {
-    command = "ansible-galaxy collection install community.general && ansible-galaxy role install -r requirements.yml && ansible-playbook -u ec2-user -i '${aws_instance.webInstance.public_ip},' -T 300 provision.yml" 
-  }
 }
 
 

@@ -9,7 +9,7 @@ terraform {
   # The other setting will be passed from backend.hcl from
   # command $terraform init -backend-config=backend.hcl
   backend "s3" {
-    key = "global/s3/petclinic/dev/terraform.tfstate"
+    key = "global/s3/petclinic/prod/terraform.tfstate"
   }
 }
 
@@ -17,6 +17,11 @@ provider "aws" {
   # Allow any 3.11.x version of the AWS provider
   version = "~> 3.11"
   region  = var.region
+}
+
+module "elasticip" {
+  region = var.region
+  source = "../../modules/elasticip"  
 }
 
 module "vpcinstance" {
@@ -31,23 +36,13 @@ module "vpcinstance" {
 
 }
 
-resource "local_file" "privatekey" {
-    filename = "deploy.pem"
-    sensitive_content = module.vpcinstance.private_key_pem 
-     provisioner "local-exec" {
-        command = "chmod 600 ${self.filename}"
-  }
+resource "aws_eip_association" "eip_assoc" {
+instance_id   = module.vpcinstance.instance_id
+allocation_id = module.elasticip.elasticip_eip_alloc_id
 }
 
 
-module "provisioner" {
-  source = "../../modules/provisioner"
-  username = "ec2-user"
-  private_key_pem = module.vpcinstance.private_key_pem
-  public_ip = module.vpcinstance.public_instance_ip
-  trigger_public_ip = module.vpcinstance.public_instance_ip
-  
-}
+
 
 
 

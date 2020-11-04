@@ -1,0 +1,26 @@
+---
+
+- hosts: all
+- name: Install Docker
+  hosts: all
+  become: true
+  roles:
+    - role: phrosenberg.docker
+      vars:
+        docker_users:
+          - ec2-user 
+        docker_daemon_options:
+          debug: false
+          live-restore: true
+
+  tasks:
+    - name: Reset ssh connection
+      meta: reset_connection
+    - name: copy docker-compose.yml 
+      copy:
+        src: ./docker-compose.yml
+        dest: ./docker-compose.yml 
+    - name: Run docker-compose
+      community.general.docker_compose:
+        project_src: .
+        state: present
