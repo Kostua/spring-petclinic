@@ -66,7 +66,7 @@ pipeline {
         stage('Terraform Init/Valitade/Plan') {
           steps {
                 withVault([configuration: configuration, vaultSecrets: secrets]){ 
-                dir('deploy/AWS/Terraform/live/dev'){
+                dir('deploy/aws/terraform/live/dev'){
                     sh "terraform init -backend-config=backend.hcl -input=false"
                     sh "terraform validate"
                     sh "terraform plan -out terraform.tfplan"
@@ -89,7 +89,7 @@ pipeline {
                          currentBuild.result = 'UNSTABLE'
                     }
                     if(apply){
-                        dir('deploy/AWS/Terraform/live/dev'){
+                        dir('deploy/aws/terraform/live/dev'){
                             unstash "terraform-plan"
                             sh 'terraform apply -input=false -auto-approve terraform.tfplan'
                         }
@@ -101,13 +101,50 @@ pipeline {
           stage('Sanity check'){
             steps {
               withVault([configuration: configuration, vaultSecrets: secrets]){
-                 dir('deploy/AWS/Terraform/live/dev'){
+                 dir('deploy/aws/terraform/live/dev'){
                   input "Does the staging environment look ok?"
                   sh 'terraform destroy -input=false -auto-approve'
                  }
               }
             }
           }
+      
+       stage('Terraform Init/Valitade/Plan PROD') {
+          steps {
+                withVault([configuration: configuration, vaultSecrets: secrets]){ 
+                dir('deploy/aws/terraform/live/prod'){
+                    input "If dev env looks good deploy to PROD?"
+                    sh "terraform init -backend-config=backend.hcl -input=false"
+                    sh "terraform validate"
+                    sh "terraform plan -out terraform.tfplan"
+                    stash name: "terraform-plan", includes: "terraform.tfplan"
+                }
+              }
+          }
+        }
+
+       stage('Terraform Apply PROD'){
+            steps {
+              withVault([configuration: configuration, vaultSecrets: secrets]){
+                script{
+                    def apply = false
+                    try {
+                        input message: 'Can you please confirm the apply to PROD?', ok: 'Ready to Apply the Config'
+                        apply = true
+                    } catch (err) {
+                        apply = false
+                         currentBuild.result = 'UNSTABLE'
+                    }
+                    if(apply){
+                        dir('deploy/aws/terraform/live/prod'){
+                            unstash "terraform-plan"
+                            sh 'terraform apply -input=false -auto-approve terraform.tfplan'
+                        }
+                    }
+                }
+            }
+        }
+     }
     
   }  
     post {

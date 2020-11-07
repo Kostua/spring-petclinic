@@ -32,11 +32,11 @@ module "vpcinstance" {
 }
 
 resource "local_file" "privatekey" {
-    filename = "deploy.pem"
+    filename = "./ansible/deploy.pem"
     sensitive_content = module.vpcinstance.private_key_pem 
-     provisioner "local-exec" {
+    provisioner "local-exec" {
         command = "chmod 600 ${self.filename}"
-  }
+    }
 }
 
 

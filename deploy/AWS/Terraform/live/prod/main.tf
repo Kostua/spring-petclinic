@@ -41,6 +41,25 @@ instance_id   = module.vpcinstance.instance_id
 allocation_id = module.elasticip.elasticip_eip_alloc_id
 }
 
+resource "local_file" "privatekey" {
+    filename = "./ansible/deploy.pem"
+    sensitive_content = module.vpcinstance.private_key_pem 
+    provisioner "local-exec" {
+        command = "chmod 600 ${self.filename}"
+    }
+}
+
+module "provisioner" {
+  source = "../../modules/provisioner"
+  username = "ec2-user"
+  private_key_pem = module.vpcinstance.private_key_pem
+  public_ip = module.elasticip.elasticip_eip
+  trigger_public_ip = module.vpcinstance.public_instance_ip
+  
+}
+
+
+
 
 
 

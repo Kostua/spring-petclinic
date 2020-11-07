@@ -81,6 +81,25 @@ resource "aws_security_group" "sg_80" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+resource "aws_security_group" "sg_443" {
+  name   = "sg_443"
+  vpc_id = aws_vpc.vpc.id
+
+  # Test web access from the VPC
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   tags = var.vpc_tags
 
 }
@@ -100,7 +119,7 @@ resource "aws_instance" "webInstance" {
   ami                    = var.instance_ami
   instance_type          = var.instance_type
   subnet_id              = aws_subnet.subnet_public.id
-  vpc_security_group_ids = [aws_security_group.sg_22.id, aws_security_group.sg_80.id]
+  vpc_security_group_ids = [aws_security_group.sg_22.id, aws_security_group.sg_80.id, aws_security_group.sg_443.id]
   key_name               = aws_key_pair.ec2key.key_name
   tags                   = var.vpc_tags
 }
