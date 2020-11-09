@@ -3,6 +3,10 @@ variable "region" {
   type = string
 }
 
+variable "environment" {
+  type = string
+}
+
 variable "vpc_name" {
   description = "Name of VPC"
   type        = string
@@ -36,7 +40,4 @@ variable "instance_type" {
 variable "vpc_tags" {
   description = "Tags to apply to resources created by VPC module"
   type        = map(string)
-  default = {
-    Terraform   = "true"
-  }
 }
