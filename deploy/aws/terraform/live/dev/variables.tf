@@ -3,9 +3,15 @@ variable "region" {
     default = "us-east-2"
 }
 
+variable "environment" {
+  description = "Name of environment"
+  default = "dev"
+}
+
+
 variable "vpc_name" {
   description = "Name of VPC"
-  default     = "petclinic"
+  default = "dev"
 }
 
 variable "cidr_vpc" {

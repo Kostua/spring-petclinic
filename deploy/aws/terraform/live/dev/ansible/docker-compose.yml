@@ -1,15 +1,44 @@
-version: '3'
-services:
-  reverse-proxy:
-   image: traefik:v2.3 
-   # Enables the web UI and tells Traefik to listen to docker
-   command: --api.insecure=true --providers.docker
-   ports:
-   - 80:80
-   depends_on:
-   - app 
+version: '3.8'
 
-  app:
+networks:
+  outside-nw:
+  internal-nw:
+
+services:
+
+  application:
     image: kostua/petclinic:latest 
-    expose:
-      - "8080"
+    ports:
+      - 8080
+    networks:
+      - internal-nw
+    restart: unless-stopped
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.application.loadbalancer.server.port=8080
+      - traefik.http.routers.application.rule=Host(``)
+
+
+  load-balancer:
+    image: 'traefik:v2.3'
+    command: >
+      --providers.docker=true
+      --providers.docker.exposedbydefault=false
+      --entryPoints.http.address=":80"
+      --api=true
+      --api.insecure=true
+      --api.dashboard=true
+    ports:
+      - "80:80"  # load balancer port
+    volumes:
+      # traefik does its magic by reading information about running containers from the docker socket
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - outside-nw
+      - internal-nw
+    depends_on:
+      - application
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.traefik_http.service=api@internal
+      - traefik.http.routers.traefik_http.entrypoints=http
