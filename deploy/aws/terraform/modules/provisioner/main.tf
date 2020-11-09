@@ -4,7 +4,8 @@
 
 resource "null_resource" "ansible_provisioner" {
   triggers = {
-    public_ip = var.trigger_public_ip 
+    always_run = "${timestamp()}"
+    # public_ip = var.trigger_public_ip 
   }
 
   connection {
@@ -14,7 +15,6 @@ resource "null_resource" "ansible_provisioner" {
     private_key = var.private_key_pem
   }
 
-  // change permissions to executable and pipe its output into a new file
   provisioner "remote-exec" {
     #  Install Python for Ansible
     inline = [

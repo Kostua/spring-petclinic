@@ -16,6 +16,7 @@
   tasks:
     - name: Reset ssh connection
       meta: reset_connection
+    - name: 
     - name: copy docker-compose.yml 
       copy:
         src: ./docker-compose.yml

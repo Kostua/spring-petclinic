@@ -63,7 +63,7 @@ pipeline {
 
         }
 
-        stage('Terraform Init/Valitade/Plan') {
+        stage('Terraform Init/Valitade/Plan DEV') {
           steps {
                 withVault([configuration: configuration, vaultSecrets: secrets]){ 
                 dir('deploy/aws/terraform/live/dev'){
@@ -76,7 +76,7 @@ pipeline {
           }
         }
 
-           stage('Terraform Apply'){
+           stage('Terraform Apply DEV'){
             steps {
               withVault([configuration: configuration, vaultSecrets: secrets]){
                 script{
@@ -98,7 +98,7 @@ pipeline {
             }
         }
      }
-          stage('Sanity check'){
+          stage('Sanity check DEV'){
             steps {
               withVault([configuration: configuration, vaultSecrets: secrets]){
                  dir('deploy/aws/terraform/live/dev'){
