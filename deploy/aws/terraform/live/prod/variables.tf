@@ -3,6 +3,11 @@ variable "region" {
     default = "us-east-2"
 }
 
+variable "environment" {
+  description = "Name of environment"
+  default = "prod"
+}
+
 variable "vpc_name" {
   description = "Name of VPC"
   default     = "petclinic"
