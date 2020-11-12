@@ -1,7 +1,6 @@
 terraform {
-  required_version = "~> 0.13"
+  required_version = "=> 0.12"
 }
-
 
 #resources
 resource "aws_vpc" "vpc" {
