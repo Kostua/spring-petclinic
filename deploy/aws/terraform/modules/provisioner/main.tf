@@ -2,7 +2,7 @@
 # Provision the server using remote-exec
 # ---------------------------------------------------------------------------------------------------------------------
 terraform {
-  required_version = "=> 0.12"
+  required_version = ">= 0.12"
 }
 
 resource "null_resource" "ansible_provisioner" {

@@ -1,6 +1,6 @@
 terraform {
   # Allow any 0.13.x version of Terraform
-  required_version = "=> 0.12"
+  required_version = ">= 0.12"
 }
 
 
