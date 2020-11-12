@@ -26,6 +26,7 @@ module "elasticip" {
 
 module "vpcinstance" {
   region = var.region
+  environment = var.environment
   source = "../../modules/vpcinstance"
   vpc_name = var.vpc_name
   cidr_vpc = var.cidr_vpc
@@ -33,6 +34,7 @@ module "vpcinstance" {
   availability_zone = var.availability_zone
   instance_ami = var.instance_ami
   instance_type = var.instance_type
+  vpc_tags = var.vpc_tags
 
 }
 
