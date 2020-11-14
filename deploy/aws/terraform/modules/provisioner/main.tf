@@ -7,7 +7,7 @@ terraform {
 
 resource "null_resource" "ansible_provisioner" {
   triggers = {
-    always_run = "${timestamp()}"
+    always_run = timestamp()
     # public_ip = var.trigger_public_ip 
   }
 
