@@ -1,44 +1,38 @@
-version: '3.8'
-
-networks:
-  outside-nw:
-  internal-nw:
+version: "3.3"
 
 services:
 
-  application:
-    image: kostua/petclinic:latest 
+  traefik:
+    image: "traefik:v2.3"
+    container_name: "traefik"
+    command:
+      #- "--log.level=DEBUG"
+      # Enabling docker provider
+      - "--providers.docker=true"
+       # Do not expose containers unless explicitly told so
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.websecure.address=:443"
     ports:
-      - 8080
-    networks:
-      - internal-nw
-    restart: unless-stopped
-    labels:
-      - traefik.enable=true
-      - traefik.http.services.application.loadbalancer.server.port=8080
-      - traefik.http.routers.application.rule=Host(``)
-
-
-  load-balancer:
-    image: 'traefik:v2.3'
-    command: >
-      --providers.docker=true
-      --providers.docker.exposedbydefault=false
-      --entryPoints.http.address=":80"
-      --api=true
-      --api.insecure=true
-      --api.dashboard=true
-    ports:
-      - "80:80"  # load balancer port
+      - "443:443"
     volumes:
-      # traefik does its magic by reading information about running containers from the docker socket
+      # Create a letsencrypt dir within the folder where the docker-compose file is
+      - "./letsencrypt:/letsencrypt"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-    networks:
-      - outside-nw
-      - internal-nw
-    depends_on:
-      - application
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.traefik_http.service=api@internal
-      - traefik.http.routers.traefik_http.entrypoints=http
+      # Redirect all HTTP to HTTPS permanently
+      - "traefik.http.routers.http_catchall.rule=HostRegexp(`{any:.+}`)"
+      - "traefik.http.routers.http_catchall.entrypoints=web"
+      - "traefik.http.routers.http_catchall.middlewares=https_redirect"
+      - "traefik.http.middlewares.https_redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.https_redirect.redirectscheme.permanent=true"
+
+  petclinic:
+    image: "kostua/petclinic:latest"
+    container_name: "petclinic-service"
+    ports:
+     - "8080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.petclinic.rule=Host(``)"
+      - "traefik.http.routers.petclinic.entrypoints=websecure"
+      - "traefik.http.routers.petclinic.tls=true"
