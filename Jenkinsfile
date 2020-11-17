@@ -32,7 +32,7 @@ pipeline {
     stages {
         stage('Unit tests') {
              agent {
-             docker { image 'maven:3.6-openjdk-16'
+             docker { image 'adoptopenjdk/openjdk8:jdk8u232-b09-debian'
                       args '-v $HOME/.m2:/root/.m2'
                       }
             }
@@ -42,8 +42,13 @@ pipeline {
 
                 // Run Maven make package and stash artifact with name "app" 
                 //sh "mvn -Dmaven.test.failure.ignore=true -Dcheckstyle.skip package"
-                sh "./mvnw clean compile"
+                sh "./mvnw -Dcheckstyle.skip package"
                 sh "./mvnw test"
+                publishHTML (target: [
+                    reportDir: 'target/site/jacoco/', reportFiles: 'index.html',
+                    reportName: "JaCoCo Report"
+                ])
+
                 stash includes: '**/target/*.jar', name: 'app'
 
             }
