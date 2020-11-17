@@ -43,7 +43,7 @@ pipeline {
                 // Run Maven make package and stash artifact with name "app" 
                 //sh "mvn -Dmaven.test.failure.ignore=true -Dcheckstyle.skip package"
                 sh "./mvnw -Dcheckstyle.skip package"
-                sh "./mvnw test"
+                sh "./mvnw -Dcheckstyle.skip test"
                 publishHTML (target: [
                     reportDir: 'target/site/jacoco/', reportFiles: 'index.html',
                     reportName: "JaCoCo Report"
