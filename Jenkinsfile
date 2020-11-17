@@ -17,12 +17,9 @@ pipeline {
         disableConcurrentBuilds()
     }
 
-     parameters {
-       ORG_NAME = "kostua"
-       APP_NAME = "petclinic"
-    }
-
      environment {
+        ORG_NAME = "kostua"
+        APP_NAME = "petclinic"
         TF_HOME = tool('terraform')
         TF_IN_AUTOMATION = "true"
         PATH = "$TF_HOME:$PATH"
