@@ -18,7 +18,8 @@ pipeline {
     }
 
      parameters {
-        string(name: 'WORKSPACE', defaultValue: 'development', description:'setting up workspace for terraform')
+       ORG_NAME = "kostua"
+       APP_NAME = "petclinic"
     }
 
      environment {
@@ -32,7 +33,7 @@ pipeline {
       pollSCM('H/5 * * * *') 
     }
     stages {
-        stage('Test') {
+        stage('Unit tests') {
              agent {
              docker { image 'maven:3.6-openjdk-16'
                       args '-v $HOME/.m2:/root/.m2'
@@ -43,7 +44,9 @@ pipeline {
                 git branch: "main", url: 'https://github.com/Kostua/spring-petclinic'
 
                 // Run Maven make package and stash artifact with name "app" 
-                sh "mvn -Dmaven.test.failure.ignore=true -Dcheckstyle.skip package"
+                //sh "mvn -Dmaven.test.failure.ignore=true -Dcheckstyle.skip package"
+                sh "./mvnw clean compile"
+                sh "./mvnw test"
                 stash includes: '**/target/*.jar', name: 'app'
 
             }
@@ -55,9 +58,9 @@ pipeline {
                 // Login to DockerHub with credential from Vault
                 withVault([configuration: configuration, vaultSecrets: secrets]) {
                 unstash 'app'
-                sh "docker build -t kostua/petclinic:latest ."
+                sh "docker build -t ${ORG_NAME}/${APP_NAME}:latest ."
                 sh "docker login -u ${env.GITHUB_USERNAME} -p ${env.GITHUB_PASSWORD}"
-                sh "docker push kostua/petclinic:latest"
+                sh "docker push ${ORG_NAME}/${APP_NAME}:latest"
                 }
             }
 
