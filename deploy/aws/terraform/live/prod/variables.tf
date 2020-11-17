@@ -1,11 +1,11 @@
 # Variables
 variable "region" {
-    default = "us-east-2"
+  default = "us-east-2"
 }
 
 variable "environment" {
   description = "Name of environment"
-  default = "prod"
+  default     = "prod"
 }
 
 variable "vpc_name" {
@@ -14,13 +14,13 @@ variable "vpc_name" {
 }
 
 variable "cidr_vpc" {
-    description = "CIDR block for the VPC"
-    default = "10.1.0.0/16"
+  description = "CIDR block for the VPC"
+  default     = "10.1.0.0/16"
 }
 
 variable "cidr_subnet" {
-    description = "CIDR block for the subnet"
-    default = "10.1.0.0/24"
+  description = "CIDR block for the subnet"
+  default     = "10.1.0.0/24"
 }
 
 variable "availability_zone" {
@@ -41,7 +41,7 @@ variable "instance_type" {
 variable "vpc_tags" {
   description = "Tags to apply to resources created by VPC module"
   type        = map(string)
-  default     = {
+  default = {
     Terraform   = "true",
     Environment = "prod"
   }

@@ -14,27 +14,27 @@ variable "vpc_name" {
 
 variable "cidr_vpc" {
   description = "CIDR block for the VPC"
-  type = string
+  type        = string
 }
 
 variable "cidr_subnet" {
   description = "CIDR block for the subnet"
-  type = string
+  type        = string
 }
 
 variable "availability_zone" {
   description = "availability zone to create subnet"
-  type = string
+  type        = string
 }
 
 variable "instance_ami" {
   description = "AMI for aws EC2 instance"
-  type = string
+  type        = string
 }
 
 variable "instance_type" {
   description = "type for aws EC2 instance"
-  type = string
+  type        = string
 }
 
 variable "vpc_tags" {

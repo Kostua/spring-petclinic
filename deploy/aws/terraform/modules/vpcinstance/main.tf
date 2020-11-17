@@ -108,7 +108,7 @@ resource "aws_security_group" "sg_443" {
 }
 
 resource "tls_private_key" "keypair" {
-  algorithm   = "RSA"
+  algorithm = "RSA"
 }
 
 
