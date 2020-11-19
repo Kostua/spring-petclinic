@@ -1,6 +1,7 @@
 # Variables
 variable "region" {
-  type = string
+  description = "The AWS region to create things in."
+  type        = string
 }
 
 variable "environment" {
@@ -33,7 +34,7 @@ variable "instance_ami" {
 }
 
 variable "instance_type" {
-  description = "type for aws EC2 instance"
+  description = "Type for aws EC2 instance"
   type        = string
 }
 

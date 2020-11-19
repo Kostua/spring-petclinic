@@ -3,8 +3,8 @@ terraform {
 }
 
 provider "aws" {
-  required_version = ">= 3.16.0"
-  region           = var.region
+  version = ">= 3.16.0"
+  region  = var.region
 }
 
 #resources
