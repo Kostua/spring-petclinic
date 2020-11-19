@@ -2,6 +2,11 @@ terraform {
   required_version = ">= 0.12"
 }
 
+provider "aws" {
+  required_version = ">= 3.16.0"
+  region           = var.region
+}
+
 #resources
 resource "aws_vpc" "vpc" {
   cidr_block           = var.cidr_vpc

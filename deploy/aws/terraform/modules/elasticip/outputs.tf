@@ -4,5 +4,6 @@ output "elasticip_eip" {
 }
 
 output "elasticip_eip_alloc_id" {
-  value = aws_eip.elasticip.id
+  description = "The public Elastic IP"
+  value       = aws_eip.elasticip.id
 }

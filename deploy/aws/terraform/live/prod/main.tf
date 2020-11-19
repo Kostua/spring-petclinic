@@ -14,8 +14,7 @@ terraform {
 }
 
 provider "aws" {
-  # Allow any 3.11.x version of the AWS provider
-  version = "~> 3.11"
+  version = ">= 3.16.0"
   region  = var.region
 }
 

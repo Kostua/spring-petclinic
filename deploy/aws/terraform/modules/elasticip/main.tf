@@ -3,7 +3,8 @@ terraform {
 }
 
 provider "aws" {
-  region = var.region
+  required_version = ">= 3.16.0"
+  region           = var.region
 }
 
 resource "aws_eip" "elasticip" {

@@ -1,4 +1,5 @@
 variable "region" {
+  description = "The AWS region to create things in."
 }
 
 variable "eip_tags" {
