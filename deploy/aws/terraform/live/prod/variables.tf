@@ -1,6 +1,7 @@
 # Variables
 variable "region" {
-  default = "us-east-2"
+  description = "The AWS region to create things in."
+  default     = "us-east-2"
 }
 
 variable "environment" {

@@ -4,3 +4,5 @@ repos:
   hooks:
     - id: terraform_fmt
     - id: terraform_docs
+    - id: terraform_docs_replace
+      args: ['--sort-by-required', '--dest=README.md']

@@ -1,4 +1,3 @@
-<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 ## Requirements
 
 | Name | Version |
@@ -38,5 +37,3 @@
 | public\_route\_table\_ids | The public route table ID |
 | public\_subnets | The public subnet ID of the VPC |
 | vpc\_id | The ID of the VPC |
-
-<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
