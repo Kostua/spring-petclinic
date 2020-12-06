@@ -1,4 +1,16 @@
+# A sample Spring-based application with automated infrastructure provisioning, app deployment, and testing
+- [Jenkins Configuration and Jobs as Code](https://github.com/Kostua/Jenkins)
+- [Terraform IaC, modularized and with remote state at S3 and DynamoDB](https://github.com/Kostua/terraform)
+- [Vault](https://github.com/Kostua/Vault)
+- [Traefik](https://github.com/Kostua/traefik-docker)
+- [Dockerized](https://www.docker.com/get-started)
+
+## Architecture of CI/CD pipeline
+
+![](./images/petclinicpipeline.png)
+
 # Spring PetClinic Sample Application [![Build Status](https://travis-ci.org/spring-projects/spring-petclinic.png?branch=main)](https://travis-ci.org/spring-projects/spring-petclinic/)
+
 
 ## Understanding the Spring Petclinic application with a few diagrams
 <a href="https://speakerdeck.com/michaelisvy/spring-petclinic-sample-application">See the presentation here</a>
