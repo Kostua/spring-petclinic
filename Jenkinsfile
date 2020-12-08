@@ -68,6 +68,9 @@ pipeline {
         }
 
         stage('Terraform Init/Valitade/Plan DEV') {
+          when {
+                branch 'development'
+            }
           steps {
                 withVault([configuration: configuration, vaultSecrets: secrets]){ 
                 dir('deploy/aws/terraform/live/dev'){
@@ -81,6 +84,9 @@ pipeline {
         }
 
            stage('Terraform Apply DEV'){
+             when {
+                branch 'development'
+            }
             steps {
               withVault([configuration: configuration, vaultSecrets: secrets]){
                 script{
@@ -103,6 +109,9 @@ pipeline {
         }
      }
           stage('Sanity check DEV'){
+            when {
+                branch 'development'
+            }
             steps {
               withVault([configuration: configuration, vaultSecrets: secrets]){
                  dir('deploy/aws/terraform/live/dev'){
@@ -114,6 +123,9 @@ pipeline {
           }
       
        stage('Terraform Init/Valitade/Plan PROD') {
+            when {
+                branch 'main'
+            }
           steps {
                 withVault([configuration: configuration, vaultSecrets: secrets]){ 
                 dir('deploy/aws/terraform/live/prod'){
@@ -128,6 +140,9 @@ pipeline {
         }
 
        stage('Terraform Apply PROD'){
+            when {
+                branch 'main'
+            }
             steps {
               withVault([configuration: configuration, vaultSecrets: secrets]){
                 script{
