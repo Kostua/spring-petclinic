@@ -1,4 +1,4 @@
-# A sample Spring-based application with automated infrastructure provisioning, app deployment, and testing
+# A simple Spring-based application with automated infrastructure provisioning, app deployment, and testing
 - [Jenkins Configuration and Jobs as Code](https://github.com/Kostua/Jenkins)
 - [Terraform IaC, modularized and with remote state at S3 and DynamoDB](https://github.com/Kostua/terraform)
 - [Vault](https://github.com/Kostua/Vault)
