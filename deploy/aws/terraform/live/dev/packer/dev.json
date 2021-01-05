@@ -1,0 +1,44 @@
+{
+  "variables": {
+    "environment": "dev"
+    },
+
+    "provisioners": [
+      {
+          "type": "shell",
+          "execute_command": "echo 'ec2-user' | {{ .Vars }} sudo -E -S sh '{{ .Path }}'",
+          "inline": [
+             "amazon-linux-extras install ansible2 -y"
+          ]
+      },
+      { 
+          "type": "shell",
+          "inline":[
+              "ansible-galaxy collection install community.general"
+          ]
+
+      },
+      {
+        "type": "file",
+        "source": "./ansible/",
+        "destination": "/home/ec2-user/"
+      },
+      {
+        "type": "ansible-local",
+        "playbook_file": "./ansible/provision.yml",
+        "galaxy_file": "./ansible/requirements.yml"
+      }
+    ],
+  
+    "builders": [{
+      "type": "amazon-ebs",
+      "profile": "default",
+      "region": "us-east-2",
+      "source_ami": "ami-0a0ad6b70e61be944",
+      "instance_type": "t2.micro",
+      "ssh_username": "ec2-user",
+      "ami_name": "packer-{{user `environment`}}",
+      "force_deregister": "true",
+      "force_delete_snapshot": "true"
+    }]
+  } 

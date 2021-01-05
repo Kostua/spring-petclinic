@@ -1,2 +1,3 @@
 # from galaxy
-- src: phrosenberg.docker 
+roles:
+- src: phrosenberg.docker
