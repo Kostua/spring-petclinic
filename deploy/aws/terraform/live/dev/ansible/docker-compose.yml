@@ -2,37 +2,43 @@ version: "3.3"
 
 services:
 
-  traefik:
-    image: "traefik:v2.3"
-    container_name: "traefik"
-    command:
-      #- "--log.level=DEBUG"
-      # Enabling docker provider
-      - "--providers.docker=true"
-       # Do not expose containers unless explicitly told so
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.websecure.address=:443"
-    ports:
-      - "443:443"
-    volumes:
-      # Create a letsencrypt dir within the folder where the docker-compose file is
-      - "./letsencrypt:/letsencrypt"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-    labels:
-      # Redirect all HTTP to HTTPS permanently
-      - "traefik.http.routers.http_catchall.rule=HostRegexp(`{any:.+}`)"
-      - "traefik.http.routers.http_catchall.entrypoints=web"
-      - "traefik.http.routers.http_catchall.middlewares=https_redirect"
-      - "traefik.http.middlewares.https_redirect.redirectscheme.scheme=https"
-      - "traefik.http.middlewares.https_redirect.redirectscheme.permanent=true"
+#  traefik:
+#    image: "traefik:v2.3"
+#    container_name: "traefik"
+#    command:
+#      #- "--log.level=DEBUG"
+#      # Enabling docker provider
+#      - "--providers.docker=true"
+#       # Do not expose containers unless explicitly told so
+#      - "--providers.docker.exposedbydefault=false"
+#      - "--entrypoints.websecure.address=:443"
+#      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+#      #- "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+#      - "--certificatesresolvers.myresolver.acme.email=kostua.p@gmail.com"
+#      # Tell to store the certificate on a path under our volume
+#      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+#    ports:
+#      - "443:443"
+#    volumes:
+#      # Create a letsencrypt dir within the folder where the docker-compose file is
+#      - "./letsencrypt:/letsencrypt"
+#      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+#    labels:
+#      # Redirect all HTTP to HTTPS permanently
+#      - "traefik.http.routers.http_catchall.rule=HostRegexp(`{any:.+}`)"
+#      - "traefik.http.routers.http_catchall.entrypoints=web"
+#      - "traefik.http.routers.http_catchall.middlewares=https_redirect"
+#      - "traefik.http.middlewares.https_redirect.redirectscheme.scheme=https"
+#      - "traefik.http.middlewares.https_redirect.redirectscheme.permanent=true"
 
   petclinic:
     image: "kostua/petclinic:latest"
     container_name: "petclinic-service"
     ports:
-     - "8080"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.petclinic.rule=Host(``)"
-      - "traefik.http.routers.petclinic.entrypoints=websecure"
-      - "traefik.http.routers.petclinic.tls=true"
+     - "80:8080"
+    restart: always
+#    labels:
+#      - "traefik.enable=true"
+#      - "traefik.http.routers.petclinic.rule=Host(`ptclinic.pp.ua`)"
+#      - "traefik.http.routers.petclinic.entrypoints=websecure"
+#      - "traefik.http.routers.petclinic.tls.certresolver=myresolver"

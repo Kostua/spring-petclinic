@@ -14,7 +14,7 @@
       { 
           "type": "shell",
           "inline":[
-              "ansible-galaxy collection install community.general"
+              "ansible-galaxy collection install community.general:1.3.5"
           ]
 
       },

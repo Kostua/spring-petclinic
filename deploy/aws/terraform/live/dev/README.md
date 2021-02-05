@@ -3,23 +3,34 @@
 | Name | Version |
 |------|---------|
 | terraform | >= 0.12 |
-| aws | >= 3.16.0 |
+| aws | >= 3.20.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| aws | >= 3.16.0 |
+| aws | >= 3.20.0 |
 | null | n/a |
+| random | n/a |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| enable\_blue\_env | Enable blue environment | `bool` | `true` | no |
+| enable\_vpn\_gateway | Enable a VPN gateway in your VPC. | `bool` | `false` | no |
 | environment | Variables | `string` | `"dev"` | no |
-| region | n/a | `string` | `"us-east-2"` | no |
-| vpc\_tags | Tags to apply to resources created by VPC module | `map(string)` | <pre>{<br>  "Environment": "dev",<br>  "Terraform": "true"<br>}</pre> | no |
+| instance\_type | type for aws EC2 instance | `string` | `"t2.micro"` | no |
+| private\_subnet\_cidr\_blocks | Available cidr blocks for private subnets | `list(string)` | <pre>[<br>  "10.0.101.0/24",<br>  "10.0.102.0/24",<br>  "10.0.103.0/24",<br>  "10.0.104.0/24",<br>  "10.0.105.0/24",<br>  "10.0.106.0/24",<br>  "10.0.107.0/24",<br>  "10.0.108.0/24"<br>]</pre> | no |
+| private\_subnet\_count | Number of private subnets. | `number` | `2` | no |
+| public\_subnet\_cidr\_blocks | Available cidr blocks for public subnets | `list(string)` | <pre>[<br>  "10.0.1.0/24",<br>  "10.0.2.0/24",<br>  "10.0.3.0/24",<br>  "10.0.4.0/24",<br>  "10.0.5.0/24",<br>  "10.0.6.0/24",<br>  "10.0.7.0/24",<br>  "10.0.8.0/24"<br>]</pre> | no |
+| public\_subnet\_count | Number of public subnets. | `number` | `2` | no |
+| region | The region Terraform deploys your instances | `string` | `"us-east-2"` | no |
+| tags | Tags to apply to resources | `map(string)` | <pre>{<br>  "Environment": "dev",<br>  "Terraform": "true"<br>}</pre> | no |
+| vpc\_cidr\_block | CIDR block for VPC | `string` | `"10.0.0.0/16"` | no |
 
 ## Outputs
 
-No output.
+| Name | Description |
+|------|-------------|
+| lb\_dns\_name | n/a |
