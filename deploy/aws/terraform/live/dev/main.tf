@@ -32,6 +32,7 @@ resource "null_resource" "packer_runner" {
 data "aws_ami" "app_ami" {
   most_recent = true
   owners      = ["self"]
+  depends_on  = [null_resource.packer_runner]
 
   filter {
     name   = "name"
@@ -40,8 +41,12 @@ data "aws_ami" "app_ami" {
 
 }
 
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
 resource "aws_vpc" "my_vpc" {
-  cidr_block           = "10.0.0.0/16"
+  cidr_block           = var.vpc_cidr_block
   enable_dns_hostnames = true
 
   tags = merge(
@@ -52,23 +57,24 @@ resource "aws_vpc" "my_vpc" {
   )
 }
 
-resource "aws_subnet" "public_us_east_2a" {
+resource "aws_subnet" "primary" {
   vpc_id            = aws_vpc.my_vpc.id
-  cidr_block        = "10.0.0.0/24"
-  availability_zone = "us-east-2a"
+  cidr_block        = var.public_subnet_cidr_blocks[0]
+  availability_zone = data.aws_availability_zones.available.names[0]
+
 
   tags = {
-    Name = "Public Subnet us-east-2a"
+    Name = "Public Subnet primary"
   }
 }
 
-resource "aws_subnet" "public_us_east_2b" {
+resource "aws_subnet" "secondary" {
   vpc_id            = aws_vpc.my_vpc.id
-  cidr_block        = "10.0.1.0/24"
-  availability_zone = "us-east-2b"
+  cidr_block        = var.public_subnet_cidr_blocks[1]
+  availability_zone = data.aws_availability_zones.available.names[1]
 
   tags = {
-    Name = "Public Subnet us-east-2b"
+    Name = "Public Subnet secondary"
   }
 }
 
@@ -93,13 +99,13 @@ resource "aws_route_table" "my_vpc_public" {
   }
 }
 
-resource "aws_route_table_association" "my_vpc_us_east_2a_public" {
-  subnet_id      = aws_subnet.public_us_east_2a.id
+resource "aws_route_table_association" "primary_public" {
+  subnet_id      = aws_subnet.primary.id
   route_table_id = aws_route_table.my_vpc_public.id
 }
 
-resource "aws_route_table_association" "my_vpc_us_east_2b_public" {
-  subnet_id      = aws_subnet.public_us_east_2b.id
+resource "aws_route_table_association" "secondary_public" {
+  subnet_id      = aws_subnet.secondary.id
   route_table_id = aws_route_table.my_vpc_public.id
 }
 
@@ -178,8 +184,8 @@ resource "aws_lb" "app" {
     aws_security_group.elb_http.id
   ]
   subnets = [
-    aws_subnet.public_us_east_2a.id,
-    aws_subnet.public_us_east_2b.id
+    aws_subnet.primary.id,
+    aws_subnet.secondary.id
   ]
 
 }
@@ -231,8 +237,8 @@ resource "aws_autoscaling_group" "bar" {
   max_size                  = 4
   desired_capacity          = 1
   vpc_zone_identifier = [
-    aws_subnet.public_us_east_2a.id,
-    aws_subnet.public_us_east_2b.id
+    aws_subnet.primary.id,
+    aws_subnet.secondary.id
   ]
   lifecycle {
     create_before_destroy = true
