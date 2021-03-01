@@ -14,25 +14,22 @@ terraform {
 }
 
 provider "aws" {
-  # Allow any 3.20.x version of the AWS provider
-  version = ">= 3.20.0"
-  region  = var.region
+  region = var.region
 }
 
-resource "null_resource" "packer_runner" {
-  triggers = {
-    always_run = timestamp()
-  }
+# resource "null_resource" "packer_runner" {
+#   triggers = {
+#     always_run = timestamp()
+#   }
 
-  provisioner "local-exec" {
-    command = "packer build -var 'environment=${var.environment}' ./packer/dev.json"
-  }
-}
+#   provisioner "local-exec" {
+#     command = "packer build -var 'environment=${var.environment}' ./packer/dev.json"
+#   }
+# }
 
 data "aws_ami" "app_ami" {
   most_recent = true
   owners      = ["self"]
-  depends_on  = [null_resource.packer_runner]
 
   filter {
     name   = "name"
@@ -110,52 +107,21 @@ resource "aws_route_table_association" "secondary_public" {
 }
 
 resource "aws_security_group" "allow_http" {
-  name        = "allow_http"
-  description = "Allow HTTP inbound connections"
+  description = "Allow connection between NLB and target"
   vpc_id      = aws_vpc.my_vpc.id
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "Allow HTTP Security Group"
-  }
 }
 
-resource "aws_security_group" "elb_http" {
-  name        = "elb_http"
-  description = "Allow HTTP traffic to instances through Elastic Load Balancer"
-  vpc_id      = aws_vpc.my_vpc.id
+resource "aws_security_group_rule" "ingress" {
+  for_each = var.ports
 
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "Allow HTTP through ELB Security Group"
-  }
+  security_group_id = aws_security_group.allow_http.id
+  from_port         = each.value
+  to_port           = each.value
+  protocol          = "TCP"
+  type              = "ingress"
+  cidr_blocks       = ["0.0.0.0/0"]
 }
+
 
 resource "aws_launch_configuration" "as_conf" {
   image_id                    = data.aws_ami.app_ami.id
@@ -178,59 +144,60 @@ resource "random_pet" "app" {
 resource "aws_lb" "app" {
   name                             = "main-app-${random_pet.app.id}-lb"
   internal                         = false
-  load_balancer_type               = "application"
-  enable_cross_zone_load_balancing = true
-  security_groups = [
-    aws_security_group.elb_http.id
-  ]
+  load_balancer_type               = "network"
+  enable_cross_zone_load_balancing = false
+  #  security_groups = [
+  #    aws_security_group.elb_http.id
+  #  ]
   subnets = [
-    aws_subnet.primary.id,
-    aws_subnet.secondary.id
+    aws_subnet.primary.id
+    #   aws_subnet.secondary.id
   ]
 
 }
 
 
 resource "aws_lb_listener" "app" {
+  for_each          = var.ports
   load_balancer_arn = aws_lb.app.arn
-  port              = "80"
-  protocol          = "HTTP"
+  port              = each.value
+  protocol          = "TCP"
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.blue.arn
+    target_group_arn = aws_lb_target_group.blue[each.key].arn
 
   }
 }
 
 
 resource "aws_lb_target_group" "blue" {
-  name     = "blue-tg-${random_pet.app.id}-lb"
-  port     = 80
-  protocol = "HTTP"
+  for_each = var.ports
+  port     = each.value
+  protocol = "TCP"
   vpc_id   = aws_vpc.my_vpc.id
 
   depends_on = [
     aws_lb.app
   ]
 
-
-  health_check {
-    port     = 80
-    protocol = "HTTP"
-    timeout  = 5
-    interval = 10
-  }
   lifecycle {
     create_before_destroy = true
   }
 
+
 }
 
-resource "aws_autoscaling_group" "bar" {
+resource "aws_autoscaling_attachment" "target" {
+  for_each = var.ports
+
+  autoscaling_group_name = aws_autoscaling_group.app.id
+  alb_target_group_arn   = aws_lb_target_group.blue[each.key].arn
+}
+
+resource "aws_autoscaling_group" "app" {
   name                      = "terraform-asg-example"
   launch_configuration      = aws_launch_configuration.as_conf.name
-  target_group_arns         = [aws_lb_target_group.blue.arn]
   health_check_type         = "ELB"
   health_check_grace_period = 300
   min_size                  = 1
@@ -238,7 +205,7 @@ resource "aws_autoscaling_group" "bar" {
   desired_capacity          = 1
   vpc_zone_identifier = [
     aws_subnet.primary.id,
-    aws_subnet.secondary.id
+    # aws_subnet.secondary.id
   ]
   lifecycle {
     create_before_destroy = true

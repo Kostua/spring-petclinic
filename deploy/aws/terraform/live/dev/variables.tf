@@ -69,6 +69,15 @@ variable "private_subnet_cidr_blocks" {
   ]
 }
 
+variable "ports" {
+  description = "Port for load balancer listener"
+  type        = map(number)
+  default = {
+    http = 80
+  }
+}
+
+
 
 variable "tags" {
   description = "Tags to apply to resources"
@@ -78,10 +87,3 @@ variable "tags" {
     Environment = "dev"
   }
 }
-
-variable "enable_blue_env" {
-  description = "Enable blue environment"
-  type        = bool
-  default     = true
-}
-
