@@ -17,15 +17,15 @@ provider "aws" {
   region = var.region
 }
 
-# resource "null_resource" "packer_runner" {
-#   triggers = {
-#     always_run = timestamp()
-#   }
+resource "null_resource" "packer_runner" {
+  triggers = {
+    always_run = timestamp()
+  }
 
-#   provisioner "local-exec" {
-#     command = "packer build -var 'environment=${var.environment}' ./packer/dev.json"
-#   }
-# }
+  provisioner "local-exec" {
+    command = "packer build -var 'environment=${var.environment}' ./packer/dev.json"
+  }
+}
 
 data "aws_ami" "app_ami" {
   most_recent = true
@@ -35,6 +35,10 @@ data "aws_ami" "app_ami" {
     name   = "name"
     values = ["packer-${var.environment}"]
   }
+
+  depends_on = [
+    null_resource.packer_runner
+  ]
 
 }
 
