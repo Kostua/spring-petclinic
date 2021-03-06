@@ -14,18 +14,7 @@
           live-restore: true
 
   tasks:
-    - name: Reset ssh connection
-      meta: reset_connection
-    - name: copy docker-compose.yml 
-      copy:
-        src: ./docker-compose.yml
-        dest: ./docker-compose.yml 
-    - name: Create file for certificate 
-      file:
-        path: ./letsencrypt 
-        state: directory
-        mode: '0600'
     - name: Run docker-compose
       community.general.docker_compose:
-        project_src: .
+        project_src: /home/ec2-user/
         state: present
